@@ -1,95 +1,80 @@
+package CodeJam;
+
 import java.io.*;
-import java.util.InputMismatchException;
+import java.util.*;
 
 
-public class Solution implements Runnable
+public class Qualify_C implements Runnable
 {
 
-
-    static class TrieNode {
-        TrieNode[] children;
-        int count;
-
-        public TrieNode() {
-            children = new TrieNode[26];
-            count = 0;
-        }
-    }
-
-
-    public static void insert(TrieNode root, String word) {
-        TrieNode cur = root;
-        for (char c : word.toCharArray()) {
-            if (cur.children[c - 'A'] == null) {
-                cur.children[c - 'A'] = new TrieNode();
-            }
-            cur = cur.children[c - 'A'];
-            cur.count++;
-        }
-    }
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = Integer.parseInt(in.nextLine());
+        int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
-            String s = in.nextLine();
-            String[] ss = s.split(" ");
-            int n = Integer.parseInt(ss[0]);
-            int K = Integer.parseInt(ss[1]);
-            String[] arr = new String[n];
-
+            int n = in.nextInt();
+            int[][] arr = new int[n][2];
             for (int j = 0; j < n; j++) {
-                arr[j] = in.nextLine();
+                arr[j][0] = in.nextInt();
+                arr[j][1] = in.nextInt();
             }
-            getRes(i, n, K, arr, w);
+            getRes(arr, w, i);
         }
         w.flush();
         w.close();
     }
 
-    private void getRes(int t, int n, int K, String[] arr, PrintWriter w) {
-        // K = n / K;
-        TrieNode root = new TrieNode();
-        for (String s : arr) {
-            insert(root, s);
+    private static void getRes(int[][] arr, PrintWriter w, int t) {
+        char[] ch = new char[arr.length];
+        Map<String, Queue<Integer>> map = new HashMap<>();
+        for (int i = 0; i < arr.length; i++) {
+            String s = arr[i][0] + " " + arr[i][1];
+            map.putIfAbsent(s, new LinkedList<>());
+            map.get(s).offer(i);
         }
 
-        int[] res = postOrder(root, 0, K);
+        Arrays.sort(arr, (a1, a2) -> a1[1] - a2[1]);
+        int J = 0, C = 0;
 
-        w.println("Case #" + t + ": " + res[0]);
-    }
-
-    // res[0] len add to the res, res[1] used nodes
-    private static int[] postOrder(TrieNode root, int level, int K) {
-        int[] res = new int[2];
-        int used = 0;
-        for (int i = 0; i < 26; i++) {
-            if (root.children[i] != null) {
-                // System.out.println(i);
-                int[] add = postOrder(root.children[i], level + 1, K);
-                res[0] += add[0];
-                used += add[1];
+        for (int i = 0; i < arr.length; i++) {
+            int start = arr[i][0];
+            int index = map.get(arr[i][0] + " " + arr[i][1]).poll();
+            if (J <= start && C <= start) {
+                if (J > C) {
+                    ch[index] = 'J';
+                    J = arr[i][1];
+                }
+                else {
+                    ch[index] = 'C';
+                    C = arr[i][1];
+                }
+                continue;
             }
+            if (J <= start) {
+                ch[index] = 'J';
+                J = arr[i][1];
+                continue;
+            }
+            if (C <= start) {
+                ch[index] = 'C';
+                C = arr[i][1];
+                continue;
+            }
+            w.println("Case #" + t + ": " + "IMPOSSIBLE");
+            return;
         }
-        int cur = root.count - used;
-        res[0] += cur / K * level;
-        res[1] += used + cur / K * K;
-        // System.out.println(level + " " + res[0] + " " + res[1]);
-        return res;
+
+        StringBuilder sb = new StringBuilder();
+        for (char c : ch) {
+            sb.append(c);
+        }
+
+
+        w.println("Case #" + t + ": " + sb.toString());
     }
 
-    // the base is n. The prime mod is mod.
-//    final static int p =(int) (1e9 + 7);
-//    public static long[] getInvArray(int n) {
-//        long[] inv = new long[n + 1];
-//        inv[1] = 1;
-//        for (int i = 2; i <= n; i++) {
-//            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
-//        }
-//        return inv;
-//    }
 
 
     static class InputReader
@@ -272,7 +257,7 @@ public class Solution implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution(),"Main",1<<27).start();
+        new Thread(null, new Qualify_C(),"Main",1<<27).start();
     }
 
 }
