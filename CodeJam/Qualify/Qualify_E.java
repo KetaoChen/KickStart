@@ -1,8 +1,12 @@
+package CodeJam.Qualify;
+
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
 
 
-public class Solution2 implements Runnable
+public class Qualify_E implements Runnable
 {
 
 
@@ -12,68 +16,77 @@ public class Solution2 implements Runnable
         PrintWriter w = new PrintWriter(System.out);
         int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
-            int r = in.nextInt();
-            int s = in.nextInt();
-            getRes(r, s, w, i);
+            int N = in.nextInt();
+            int K = in.nextInt();
+            getRes(N, K, w, i);
         }
         w.flush();
         w.close();
     }
 
-    private static void getRes(int r, int s, PrintWriter w, int t) {
-        List<Integer> list = new ArrayList<>();
-        for (int j = 0; j < s; j++) {
-            for (int i = 1; i <= r; i++) {
-                list.add(i);
-            }
+    static boolean have;
+    private static void getRes(int N, int K, PrintWriter w, int t) {
+        have = false;
+        List<List<Integer>> res = new ArrayList<>();
+        helper(res, new ArrayList<>(), 0, 0, N, K, new boolean[N + 1]);
+        if (!have) {
+            w.println("Case #" + t + ": " + "IMPOSSIBLE");
+            return;
         }
 
-        int res = 0, tot = r * s;
-        int max = r;
-        List<int[]> l = new ArrayList<>();
-        while (!sorted(list)) {
-            int end = list.size() - 1;
-            boolean haveSmall = false;
-            List<Integer> temp = new ArrayList<>();
-            for (int i = tot - 1; i >= 0; i--) {
-                if (haveSmall && list.get(i) == max) {
-                    for (int j = i + 1; j <= end; j++) {
-                        temp.add(list.get(j));
-                    }
-                    for (int j = 0; j <= i; j++) {
-                        temp.add(list.get(j));
-                    }
-                    for (int j = end + 1; j < list.size(); j++) {
-                        temp.add(list.get(j));
-                    }
-                    list = temp;
-                    l.add(new int[]{i + 1, end - i});
-                    res++;
+        w.println("Case #" + t + ": " + "POSSIBLE");
+        for (List<Integer> list : res) {
+            StringBuilder sb = new StringBuilder();
+            for (int num : list) {
+                sb.append(num + " ");
+            }
+            w.println(sb.toString());
+        }
+    }
+
+    private static void helper(List<List<Integer>> res, List<Integer> temp, int row, int col, int N, int K, boolean[] used) {
+        if (have) return;
+        if (row == N) {
+            int sum = 0;
+            for (int i = 0; i < N; i++) {
+                sum += res.get(i).get(i);
+            }
+            if (sum == K) {
+                have = true;
+            }
+            return;
+        }
+        if (col == N) {
+            res.add(temp);
+            helper(res, new ArrayList<>(), row + 1, 0, N, K, new boolean[N + 1]);
+            if (!have) {
+                res.remove(res.size() - 1);
+            }
+            return;
+        }
+
+        for (int i = 1; i <= N; i++) {
+            if (used[i]) continue;
+            boolean valid = true;
+            for (List<Integer> list : res) {
+                if (list.get(col) == i) {
+                    valid = false;
                     break;
                 }
-                if (list.get(i) < max && !haveSmall) {
-                    haveSmall = true;
-                    end = i;
-                }
-                if (i == 0) {
-                    max--;
-                }
             }
+            if (!valid) continue;
+            used[i] = true;
+            temp.add(i);
+            helper(res, temp, row, col + 1, N, K, used);
+            if (!have) {
+                temp.remove(temp.size() - 1);
+                used[i] = false;
+            }
+
         }
 
-        w.println("Case #" + t + ": " + res);
-        for (int[] arr : l) {
-            w.println(arr[0] + " " + arr[1]);
-        }
+
     }
-
-    private static boolean sorted(List<Integer> list) {
-        for (int i = 1; i < list.size(); i++) {
-            if (list.get(i) < list.get(i - 1)) return false;
-        }
-        return true;
-    }
-
 
     static class InputReader
     {
@@ -255,7 +268,7 @@ public class Solution2 implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution2(),"Main",1<<27).start();
+        new Thread(null, new Qualify_E(),"Main",1<<27).start();
     }
 
 }

@@ -1,8 +1,12 @@
+package CodeJam.Qualify;
+
 import java.io.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.InputMismatchException;
+import java.util.Set;
 
 
-public class Solution1 implements Runnable
+public class Qualify_A implements Runnable
 {
 
 
@@ -13,17 +17,40 @@ public class Solution1 implements Runnable
         int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
             int N = in.nextInt();
-            int K = in.nextInt();
-            // getRes(N, K, w, i);
+            int[][] grid = new int[N][N];
+            for (int j = 0; j < N; j++) {
+                for (int k = 0; k < N; k++) {
+                    grid[j][k] = in.nextInt();
+                }
+            }
+            getRes(grid, w, i);
         }
         w.flush();
         w.close();
     }
-    private static void getRes(String[] strs, int t, PrintWriter w) {
-        // System.out.println("start");
 
-        w.println("Case #" + t + ": " );
+    private static void getRes(int[][] grid, PrintWriter w, int t) {
+
+        int sum = 0, row = 0, col = 0, l = grid.length;
+        for (int i = 0; i < l; i++) {
+            sum += grid[i][i];
+        }
+
+        for (int i = 0; i < l; i++) {
+            Set<Integer> r = new HashSet<>();
+            Set<Integer> c = new HashSet<>();
+            for (int j = 0; j < l; j++) {
+                r.add(grid[i][j]);
+                c.add(grid[j][i]);
+            }
+            if (r.size() != l) row++;
+            if (c.size() != l) col++;
+        }
+
+
+        w.println("Case #" + t + ": " + sum + " " + row + " " + col);
     }
+
 
 
     static class InputReader
@@ -206,7 +233,7 @@ public class Solution1 implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution1(),"Main",1<<27).start();
+        new Thread(null, new Qualify_A(),"Main",1<<27).start();
     }
 
 }

@@ -1,11 +1,10 @@
-package CodeJam;
+package CodeJam.RoundC;
 
 import java.io.*;
-import java.util.InputMismatchException;
-import java.util.Stack;
+import java.util.*;
 
 
-public class Qualify_B implements Runnable
+public class Pancake implements Runnable
 {
 
 
@@ -13,51 +12,46 @@ public class Qualify_B implements Runnable
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = Integer.parseInt(in.nextLine());
+        int t = (int) in.nextLong();
+        // System.out.println(t);
         for (int i = 1; i <= t; i++) {
-            String s = in.nextLine();
-            getRes(s, w, i);
+            int N = (int) in.nextLong();
+            int D = (int) in.nextLong();
+            long[] arr = new long[N];
+            for (int j = 0; j < N; j++) {
+                arr[j] = in.nextLong();
+                // System.out.print(arr[j] + " ");
+            }
+            // System.out.println();
+            w.println("Case #" + i + ": " + getRes(N, D, arr, i, w));
         }
         w.flush();
         w.close();
     }
 
-    private static void getRes(String s, PrintWriter w, int t) {
-        char[] ch = s.toCharArray();
-        Stack<Integer>  stack = new Stack<>();
-        StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < ch.length; i++) {
-            if (stack.isEmpty() || ch[i] >= ch[stack.peek()]) {
-                int diff = stack.isEmpty() ? ch[i] - '0' : ch[i] - ch[stack.peek()];
-                for (int d= 0; d < diff; d++) {
-                    sb.append('(');
-                }
-                sb.append(ch[i]);
-                stack.push(i);
-                continue;
-            }
-            int diff = ch[stack.peek()] - ch[i];
-            while (!stack.isEmpty() && ch[i] < ch[stack.peek()]) {
-                stack.pop();
-            }
-            for (int d = 0; d < diff; d++) {
-                sb.append(')');
-            }
-            sb.append(ch[i]);
-            stack.push(i);
-        }
-
-        if (!stack.isEmpty()) {
-            for (int i = 0; i < ch[stack.peek()] - '0'; i++) {
-                sb.append(')');
+    private static int getRes(int N, int D, long[] arr, int t, PrintWriter w) {
+        Map<Long, Integer> map = new HashMap<>();
+        long max = 0, min = Long.MAX_VALUE, c = 0;
+        for(long num : arr) {
+            map.put(num, map.getOrDefault(num, 0) + 1);
+            max = Math.max(max, num);
+            c = Math.max(c, map.get(num));
+            if (map.get(num) >= 2) {
+                min = Math.min(min, num);
             }
         }
+        if (D == 2) {
+            return c >= 2 ? 0 : 1;
+        }
 
-
-        w.println("Case #" + t + ": " + sb.toString());
+        if (c >= 3) return 0;
+        if (max > min) return 1;
+        for (long num : arr) {
+            if (map.containsKey(num * 2)) return 1;
+        }
+        return 2;
     }
-
 
 
     static class InputReader
@@ -240,7 +234,7 @@ public class Qualify_B implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Qualify_B(),"Main",1<<27).start();
+        new Thread(null, new Pancake(),"Main",1<<27).start();
     }
 
 }

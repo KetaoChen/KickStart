@@ -1,32 +1,45 @@
+package CodeJam.RoundC;
+
 import java.io.*;
-import java.util.InputMismatchException;
+import java.util.*;
 
 
-public class Solution3 implements Runnable
+public class Shortest_Meeting_Path implements Runnable
 {
-
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = in.nextInt();
+        int t = Integer.parseInt(in.nextLine());
         for (int i = 1; i <= t; i++) {
-
-            getRes(w, i);
+            String[] s = in.nextLine().split(" ");
+            int x = Integer.parseInt(s[0]), y = Integer.parseInt(s[1]);
+            String str = s[2];
+            getRes(x, y, str, i, w);
         }
         w.flush();
         w.close();
     }
 
 
-    private static void getRes(PrintWriter w, int t) {
+    private static void getRes(int x, int y, String s, int t, PrintWriter w) {
 
-        w.println("Case #" + t + ": ");
-    }
+        int d1 = Math.abs(x) + Math.abs(y), d2 = 0, index = 0;
+        int x1 = x, y1 = y;
+        while (d1 > index && d1 > d2 && index < s.length()) {
+            char c = s.charAt(index++);
+            if (c == 'N') y1++;
+            else if (c == 'E') x1++;
+            else if (c == 'S') y1--;
+            else x1--;
 
-    private static boolean check(int i, int j, int l, int u, int r, int d) {
-        return i >= u && i <= d && j >= l && j <= r;
+            d1 = Math.abs(x1) + Math.abs(y1);
+            d2 = Math.abs(x1 - x) + Math.abs(y1 - y);
+            // System.out.println(d1 + " " + d2);
+        }
+        if (d1 <= d2 || d1 <= index) w.println("Case #" + t + ": " + index);
+        else w.println("Case #" + t + ": IMPOSSIBLE" );
     }
 
 
@@ -210,7 +223,7 @@ public class Solution3 implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution3(),"Main",1<<27).start();
+        new Thread(null, new Shortest_Meeting_Path(),"Main",1<<27).start();
     }
 
 }

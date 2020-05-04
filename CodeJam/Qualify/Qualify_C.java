@@ -1,12 +1,10 @@
-package CodeJam;
+package CodeJam.Qualify;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 
 
-public class Qualify_E implements Runnable
+public class Qualify_C implements Runnable
 {
 
 
@@ -16,77 +14,68 @@ public class Qualify_E implements Runnable
         PrintWriter w = new PrintWriter(System.out);
         int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
-            int N = in.nextInt();
-            int K = in.nextInt();
-            getRes(N, K, w, i);
+            int n = in.nextInt();
+            int[][] arr = new int[n][2];
+            for (int j = 0; j < n; j++) {
+                arr[j][0] = in.nextInt();
+                arr[j][1] = in.nextInt();
+            }
+            getRes(arr, w, i);
         }
         w.flush();
         w.close();
     }
 
-    static boolean have;
-    private static void getRes(int N, int K, PrintWriter w, int t) {
-        have = false;
-        List<List<Integer>> res = new ArrayList<>();
-        helper(res, new ArrayList<>(), 0, 0, N, K, new boolean[N + 1]);
-        if (!have) {
+    private static void getRes(int[][] arr, PrintWriter w, int t) {
+        char[] ch = new char[arr.length];
+        Map<String, Queue<Integer>> map = new HashMap<>();
+        for (int i = 0; i < arr.length; i++) {
+            String s = arr[i][0] + " " + arr[i][1];
+            map.putIfAbsent(s, new LinkedList<>());
+            map.get(s).offer(i);
+        }
+
+        Arrays.sort(arr, (a1, a2) -> a1[1] - a2[1]);
+        int J = 0, C = 0;
+
+        for (int i = 0; i < arr.length; i++) {
+            int start = arr[i][0];
+            int index = map.get(arr[i][0] + " " + arr[i][1]).poll();
+            if (J <= start && C <= start) {
+                if (J > C) {
+                    ch[index] = 'J';
+                    J = arr[i][1];
+                }
+                else {
+                    ch[index] = 'C';
+                    C = arr[i][1];
+                }
+                continue;
+            }
+            if (J <= start) {
+                ch[index] = 'J';
+                J = arr[i][1];
+                continue;
+            }
+            if (C <= start) {
+                ch[index] = 'C';
+                C = arr[i][1];
+                continue;
+            }
             w.println("Case #" + t + ": " + "IMPOSSIBLE");
             return;
         }
 
-        w.println("Case #" + t + ": " + "POSSIBLE");
-        for (List<Integer> list : res) {
-            StringBuilder sb = new StringBuilder();
-            for (int num : list) {
-                sb.append(num + " ");
-            }
-            w.println(sb.toString());
+        StringBuilder sb = new StringBuilder();
+        for (char c : ch) {
+            sb.append(c);
         }
+
+
+        w.println("Case #" + t + ": " + sb.toString());
     }
 
-    private static void helper(List<List<Integer>> res, List<Integer> temp, int row, int col, int N, int K, boolean[] used) {
-        if (have) return;
-        if (row == N) {
-            int sum = 0;
-            for (int i = 0; i < N; i++) {
-                sum += res.get(i).get(i);
-            }
-            if (sum == K) {
-                have = true;
-            }
-            return;
-        }
-        if (col == N) {
-            res.add(temp);
-            helper(res, new ArrayList<>(), row + 1, 0, N, K, new boolean[N + 1]);
-            if (!have) {
-                res.remove(res.size() - 1);
-            }
-            return;
-        }
 
-        for (int i = 1; i <= N; i++) {
-            if (used[i]) continue;
-            boolean valid = true;
-            for (List<Integer> list : res) {
-                if (list.get(col) == i) {
-                    valid = false;
-                    break;
-                }
-            }
-            if (!valid) continue;
-            used[i] = true;
-            temp.add(i);
-            helper(res, temp, row, col + 1, N, K, used);
-            if (!have) {
-                temp.remove(temp.size() - 1);
-                used[i] = false;
-            }
-
-        }
-
-
-    }
 
     static class InputReader
     {
@@ -268,7 +257,7 @@ public class Qualify_E implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Qualify_E(),"Main",1<<27).start();
+        new Thread(null, new Qualify_C(),"Main",1<<27).start();
     }
 
 }

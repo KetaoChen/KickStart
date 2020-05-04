@@ -1,10 +1,11 @@
-package CodeJam;
+package CodeJam.Qualify;
 
 import java.io.*;
-import java.util.*;
+import java.util.InputMismatchException;
+import java.util.Stack;
 
 
-public class Qualify_C implements Runnable
+public class Qualify_B implements Runnable
 {
 
 
@@ -12,63 +13,45 @@ public class Qualify_C implements Runnable
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = in.nextInt();
+        int t = Integer.parseInt(in.nextLine());
         for (int i = 1; i <= t; i++) {
-            int n = in.nextInt();
-            int[][] arr = new int[n][2];
-            for (int j = 0; j < n; j++) {
-                arr[j][0] = in.nextInt();
-                arr[j][1] = in.nextInt();
-            }
-            getRes(arr, w, i);
+            String s = in.nextLine();
+            getRes(s, w, i);
         }
         w.flush();
         w.close();
     }
 
-    private static void getRes(int[][] arr, PrintWriter w, int t) {
-        char[] ch = new char[arr.length];
-        Map<String, Queue<Integer>> map = new HashMap<>();
-        for (int i = 0; i < arr.length; i++) {
-            String s = arr[i][0] + " " + arr[i][1];
-            map.putIfAbsent(s, new LinkedList<>());
-            map.get(s).offer(i);
-        }
-
-        Arrays.sort(arr, (a1, a2) -> a1[1] - a2[1]);
-        int J = 0, C = 0;
-
-        for (int i = 0; i < arr.length; i++) {
-            int start = arr[i][0];
-            int index = map.get(arr[i][0] + " " + arr[i][1]).poll();
-            if (J <= start && C <= start) {
-                if (J > C) {
-                    ch[index] = 'J';
-                    J = arr[i][1];
-                }
-                else {
-                    ch[index] = 'C';
-                    C = arr[i][1];
-                }
-                continue;
-            }
-            if (J <= start) {
-                ch[index] = 'J';
-                J = arr[i][1];
-                continue;
-            }
-            if (C <= start) {
-                ch[index] = 'C';
-                C = arr[i][1];
-                continue;
-            }
-            w.println("Case #" + t + ": " + "IMPOSSIBLE");
-            return;
-        }
-
+    private static void getRes(String s, PrintWriter w, int t) {
+        char[] ch = s.toCharArray();
+        Stack<Integer>  stack = new Stack<>();
         StringBuilder sb = new StringBuilder();
-        for (char c : ch) {
-            sb.append(c);
+
+        for (int i = 0; i < ch.length; i++) {
+            if (stack.isEmpty() || ch[i] >= ch[stack.peek()]) {
+                int diff = stack.isEmpty() ? ch[i] - '0' : ch[i] - ch[stack.peek()];
+                for (int d= 0; d < diff; d++) {
+                    sb.append('(');
+                }
+                sb.append(ch[i]);
+                stack.push(i);
+                continue;
+            }
+            int diff = ch[stack.peek()] - ch[i];
+            while (!stack.isEmpty() && ch[i] < ch[stack.peek()]) {
+                stack.pop();
+            }
+            for (int d = 0; d < diff; d++) {
+                sb.append(')');
+            }
+            sb.append(ch[i]);
+            stack.push(i);
+        }
+
+        if (!stack.isEmpty()) {
+            for (int i = 0; i < ch[stack.peek()] - '0'; i++) {
+                sb.append(')');
+            }
         }
 
 
@@ -257,7 +240,7 @@ public class Qualify_C implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Qualify_C(),"Main",1<<27).start();
+        new Thread(null, new Qualify_B(),"Main",1<<27).start();
     }
 
 }
