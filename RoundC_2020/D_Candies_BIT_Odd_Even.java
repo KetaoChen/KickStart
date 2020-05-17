@@ -1,9 +1,10 @@
+package RoundC_2020;
 
 import java.io.*;
-import java.util.*;
+import java.util.InputMismatchException;
 
 
-public class Solution implements Runnable
+public class D_Candies_BIT_Odd_Even implements Runnable
 {
 
 
@@ -308,7 +309,7 @@ public class Solution implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution(),"Main",1<<27).start();
+        new Thread(null, new D_Candies_BIT_Odd_Even(),"Main",1<<27).start();
     }
 
 }

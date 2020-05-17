@@ -1,9 +1,10 @@
+package RoundC_2020;
 
 import java.io.*;
 import java.util.*;
 
 
-public class Solution implements Runnable
+public class B_Stable_Wall_Topo implements Runnable
 {
 
 
@@ -14,119 +15,67 @@ public class Solution implements Runnable
         int t = Integer.parseInt(in.nextLine());
         for (int i = 1; i <= t; i++) {
             String[] s = in.nextLine().split(" ");
-            int n = Integer.parseInt(s[0]);
-            int q = Integer.parseInt(s[1]);
-            int[] arr = new int[n];
-            s = in.nextLine().split(" ");
-            for (int j = 0; j < n; j++) {
-                arr[j] = Integer.parseInt(s[j]);
+            int r = Integer.parseInt(s[0]);
+            int c = Integer.parseInt(s[1]);
+            String[] arr = new String[r];
+            for (int j = 0; j < r; j++) {
+                arr[j] = in.nextLine();
             }
-            getRes(arr);
 
-            long res = 0;
-            for (int j = 0; j < q; j++) {
-                s = in.nextLine().split(" ");
-                char c = s[0].charAt(0);
-                int left = Integer.parseInt(s[1]), right = Integer.parseInt(s[2]);
-                if (c == 'Q') {
-                    res += cal(left - 1, right - 1);
-                }
-                else {
-                    update(left - 1, right);
-                }
-            }
-            w.println("Case #" + i + ": " + res);
+            w.println("Case #" + i + ": " + getRes(r, c, arr));
         }
         w.flush();
         w.close();
     }
 
-    static long[] oddSum;
-    static long[] evenSum;
-    static long[] oddMulSum;
-    static long[] evenMulSum;
-    static long[] nums;
 
-
-    private static void getRes(int[] arr) {
-        nums = new long[arr.length];
-        oddSum = new long[arr.length + 1];
-        evenSum = new long[arr.length + 1];
-        oddMulSum = new long[arr.length + 1];
-        evenMulSum = new long[arr.length + 1];
-        for (int i = 0; i < arr.length; i++) {
-            update(i, arr[i]);
+    private static String getRes(int row, int col, String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        int[] d = new int[26];
+        Arrays.fill(d, -1);
+        List<Integer>[] list = new List[26];
+        for (int i = 0; i < 26; i++) {
+            list[i] = new ArrayList<>();
         }
-    }
 
-    private static long cal(int left, int right) {
-        long evenMul = calEvenMulRange(right + 1) - calEvenMulRange(left);
-        long evenSum = calEvenSum(right + 1) - calEvenSum(left);
-
-        long oddMul = calOddMulRange(right + 1) - calOddMulRange(left);
-        long oddSum = calOddSum(right + 1) - calOddSum(left);
-
-        long even = evenMul - evenSum * left;
-        long odd = oddMul - oddSum * left;
-
-        return left % 2 == 0 ? even - odd : odd - even;
-    }
-
-    private static long calOddMulRange(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += oddMulSum[i];
-        }
-        return res;
-    }
-
-    private static long calEvenMulRange(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += evenMulSum[i];
-        }
-        return res;
-    }
-
-    private static long calEvenSum(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += evenSum[i];
-        }
-        return res;
-    }
-
-    private static long calOddSum(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += oddSum[i];
-        }
-        return res;
-    }
-
-    private static void update(int i, int val) {
-        long change = val - nums[i];
-        nums[i] = val;
-        if (i % 2 == 0) {
-            for (int index = i + 1; index <= nums.length; index += lowbit(index)) {
-                evenSum[index] += change;
-                evenMulSum[index] += change * (i + 1);
-            }
-        }
-        else {
-            for (int index = i + 1; index <= nums.length; index += lowbit(index)) {
-                oddSum[index] += change;
-                oddMulSum[index] += change * (i + 1);
+        int count = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                char c = arr[i].charAt(j);
+                if (d[c - 'A'] == -1) {
+                    d[c - 'A'] = 0;
+                    count++;
+                }
+                if (i == 0) continue;
+                char below = arr[i - 1].charAt(j);
+                if (c != below) {
+                    d[below - 'A']++;
+                    list[c - 'A'].add(below - 'A');
+                }
             }
         }
 
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < 26; i++) {
+            if (d[i] == 0) {
+                q.offer(i);
+            }
+        }
+
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+            count--;
+            sb.append((char) (cur + 'A'));
+            for (int next : list[cur]) {
+                d[next]--;
+                if (d[next] == 0) {
+                    q.offer(next);
+                }
+            }
+        }
+
+        return count == 0 ? sb.toString() : "-1";
     }
-
-    private static int lowbit(int x) {
-        return x & -x;
-    }
-
-
 
     static class InputReader
     {
@@ -308,7 +257,7 @@ public class Solution implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution(),"Main",1<<27).start();
+        new Thread(null, new B_Stable_Wall_Topo(),"Main",1<<27).start();
     }
 
 }

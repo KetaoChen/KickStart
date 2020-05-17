@@ -1,4 +1,4 @@
-package RoundC_2019;
+package C2019;
 
 import java.io.*;
 import java.util.InputMismatchException;
