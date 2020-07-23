@@ -1,13 +1,12 @@
-package RoundB_2020;
+package KickStart_2020.RoundA_2020;
 
 import java.io.*;
-import java.util.InputMismatchException;
+import java.util.*;
+import java.lang.*;
 
 
-public class Bike_Tour implements Runnable
+public class Plate implements Runnable
 {
-
-
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
@@ -15,25 +14,55 @@ public class Bike_Tour implements Runnable
         int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
             int n = in.nextInt();
-            int[] arr = new int[n];
+            int K = in.nextInt();
+            int p = in.nextInt();
+            int[][] arr = new int[n][K];
+
             for (int j = 0; j < n; j++) {
-                arr[j] = in.nextInt();
+                for (int k = 0; k < K; k++) {
+                    arr[j][k] = in.nextInt();
+                }
             }
-            getRes(arr, w, i);
+            getRes(i, n, K, p, arr, w);
         }
         w.flush();
         w.close();
     }
 
-    private static void getRes(int[] arr, PrintWriter w, int t) {
-        int res = 0;
-        int l = arr.length;
-        for (int i = 1; i < l - 1; i++) {
-            if (arr[i] > arr[i - 1] && arr[i] > arr[i + 1]) res++;
-        }
+    private void getRes(int t, int n, int K, int P,  int[][] arr, PrintWriter w) {
+        int[][] dp = new int[n + 1][P + 1];
+        // int[][] prefix = new int[n][K + 1];
 
-        w.println("Case #" + t + ": " + res);
+        for (int i = 1; i <= n ;i++) {
+            for (int p = 1; p <= P; p++) {
+                int sum = 0;
+                for (int k = 0; k < Math.min(p, K); k++) {
+                    sum += arr[i - 1][k];
+                    dp[i][p] = Math.max(dp[i][p], Math.max(dp[i - 1][p], dp[i - 1][p - k - 1] + sum));
+                }
+            }
+        }
+        //        for (int i = 0; i <= n; i++) {
+        //            for (int p = 0; p <= P; p++) {
+        //                System.out.print(dp[i][p] + " ");
+        //            }
+        //            System.out.println();
+        //        }
+
+        w.println("Case #" + t + ": " + dp[n][P]);
     }
+
+    // the base is n. The prime mod is mod.
+//    final static int p =(int) (1e9 + 7);
+//    public static long[] getInvArray(int n) {
+//        long[] inv = new long[n + 1];
+//        inv[1] = 1;
+//        for (int i = 2; i <= n; i++) {
+//            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
+//        }
+//        return inv;
+//    }
+
 
     static class InputReader
     {
@@ -215,7 +244,7 @@ public class Bike_Tour implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Bike_Tour(),"Main",1<<27).start();
+        new Thread(null, new Plate(),"Main",1<<27).start();
     }
 
 }

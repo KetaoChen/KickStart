@@ -1,59 +1,86 @@
-package RoundC_2020;
-
+package KickStart_2020.RoundD_2020;
 import java.io.*;
 import java.util.*;
 
-
-public class C_Perfect_Subarray_Prefix_Range implements Runnable
+public class B_Alien_Piano_DP implements Runnable
 {
 
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
-        PrintWriter w = new PrintWriter(System.out);
-        int t = in.nextInt();
-        for (int i = 1; i <= t; i++) {
-            int n = in.nextInt();
-            int[] arr = new int[n];
-            for (int j = 0; j < n; j++) {
-                arr[j] = in.nextInt();
+        w = new PrintWriter(System.out);
+        T = in.nextInt();
+        for (int t = 0; t < T; t++) {
+            n = in.nextInt();
+            arr = new int[n];
+            for (int i = 0; i < n; i++) {
+                arr[i] = in.nextInt();
             }
-
-            w.println("Case #" + i + ": " + getRes(arr));
+            getRes(t + 1);
         }
+
         w.flush();
         w.close();
     }
 
+    static PrintWriter w;
+    static int T, n;
+    static int[] arr;
 
-    private static long getRes(int[] arr) {
-        long res = 0;
-        List<Integer> list = new ArrayList<>();
-        int num = 0;
-
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(0, 1);
-
-        int sum = 0, max = 0, min = 0;
-        for (int i = 0; i < arr.length; i++) {
-            sum += arr[i];
-            min = Math.min(min, sum);
-            max = Math.max(sum , max);
-            while (num * num <= max - min) {
-                list.add(num * num);
-                num++;
+    static void getRes(int t) {
+        int res = n;
+//        for (int i = 0; i < 4; i++) {
+//            res = Math.min(res, helper(i));
+//        }
+        int[][] dp = new int[n][4];
+        for (int i = 1; i < n; i++) {
+            if (arr[i] > arr[i - 1]) {
+                dp[i][0] = dp[i - 1][3] + 1;
+                dp[i][1] = dp[i - 1][0];
+                dp[i][2] = Math.min(dp[i][1], dp[i - 1][1]);
+                dp[i][3] = Math.min(dp[i][2], dp[i - 1][2]);
             }
-
-            for (int perfect : list) {
-                int target = sum - perfect;
-                res += map.getOrDefault(target, 0);
+            else if (arr[i] == arr[i - 1]){
+                for (int k = 0; k < 4; k++) {
+                    dp[i][k] = dp[i - 1][k];
+                }
             }
-            map.put(sum, map.getOrDefault(sum, 0) + 1);
+            else {
+                dp[i][3] = dp[i - 1][0] + 1;
+                dp[i][2] = dp[i - 1][3];
+                dp[i][1] = Math.min(dp[i][2], dp[i - 1][2]);
+                dp[i][0] = Math.min(dp[i][1], dp[i - 1][1]);
+            }
         }
-
-        return res;
+        for (int i = 0; i < 4; i++) {
+            res = Math.min(res, dp[n - 1][i]);
+        }
+        w.println("Case #" +  t +  ": " + res);
     }
+
+//    static int helper(int start) {
+//        int cur = start;
+//        int res = 0;
+//        for (int i = 1; i < n; i++) {
+//            if (arr[i] == arr[i - 1]) continue;
+//            if (arr[i] > arr[i - 1]) cur++;
+//            else cur--;
+//            if (cur >= 4 || cur < 0) {
+//                res++;
+//                cur = (cur + 4) % 4;
+//            }
+//        }
+//        return res;
+//    }
+//
+//    static int min(int[] nums, int i, int j) {
+//        int res = nums[i];
+//        for (int k = i; k <= j; k++) {
+//            res = Math.min(res, nums[k]);
+//        }
+//        return res;
+//    }
 
     static class InputReader
     {
@@ -235,7 +262,8 @@ public class C_Perfect_Subarray_Prefix_Range implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new C_Perfect_Subarray_Prefix_Range(),"Main",1<<27).start();
+        new Thread(null, new B_Alien_Piano_DP(),"Main",1<<27).start();
     }
 
 }
+

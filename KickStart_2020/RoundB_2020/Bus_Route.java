@@ -1,34 +1,40 @@
-package C2019;
+package KickStart_2020.RoundB_2020;
 
 import java.io.*;
 import java.util.InputMismatchException;
 
 
-public class Wiggle_Walk_A implements Runnable
+public class Bus_Route implements Runnable
 {
+
+
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = in.nextInt();
-
+        int t = (int)in.nextLong();
+        for (int i = 1; i <= t; i++) {
+            int n = (int)in.nextLong();
+            long d = in.nextLong();
+            long[] arr = new long[n];
+            for (int j = 0; j < n; j++) {
+                arr[j] = in.nextLong();
+            }
+            getRes(arr, d, w, i);
+        }
         w.flush();
         w.close();
     }
 
-
-
-    // the base is n. The prime mod is mod.
-    final static int p =(int) (1e9 + 7);
-    public static long[] getInvArray(int n) {
-        long[] inv = new long[n + 1];
-        inv[1] = 1;
-        for (int i = 2; i <= n; i++) {
-            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
+    private static void getRes(long[] arr, long d, PrintWriter w, int t) {
+        long res = d;
+        int l = arr.length;
+        for (int i = l - 1; i >= 0; i--) {
+            res = (res / arr[i]) * arr[i];
         }
-        return inv;
-    }
 
+        w.println("Case #" + t + ": " + res);
+    }
 
     static class InputReader
     {
@@ -210,7 +216,7 @@ public class Wiggle_Walk_A implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Wiggle_Walk_A(),"Main",1<<27).start();
+        new Thread(null, new Bus_Route(),"Main",1<<27).start();
     }
 
 }

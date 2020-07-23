@@ -1,64 +1,44 @@
-package RoundB_2020;
-
+package KickStart_2020.RoundD_2020;
 import java.io.*;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Map;
+import java.util.*;
 
-
-public class Robot_Path_decodeString implements Runnable
+public class A_Record_Breaker_Bruteforce implements Runnable
 {
-
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
-        PrintWriter w = new PrintWriter(System.out);
-        int t = Integer.parseInt(in.nextLine());
-        for (int i = 1; i <= t; i++) {
-            String s = in.nextLine();
-            getRes(s, w, i);
+        w = new PrintWriter(System.out);
+        T = in.nextInt();
+        for (int t = 0; t < T; t++) {
+            n = in.nextInt();
+            arr = new int[n];
+            for (int i = 0; i < n; i++) {
+                arr[i] = in.nextInt();
+            }
+            getRes(t + 1);
         }
+
         w.flush();
         w.close();
     }
 
-    static int index;
-    static int mod = (int) 1e9;
-    private static void getRes(String s, PrintWriter w, int t) {
-        index = 0;
-        Map<Character, Long> map = helper(s);
+    static PrintWriter w;
+    static int T, n;
+    static int[] arr;
 
-        long south = (1 + map.getOrDefault('S', 0L) - map.getOrDefault('N', 0L) + mod) % mod;
-        long east = (1 + map.getOrDefault('E', 0L) - map.getOrDefault('W', 0L) + mod) % mod;
-        if (south == 0) south = mod;
-        if (east == 0) east = mod;
-        w.println("Case #" + t + ": " + east + " " + south);
-    }
-
-    private static Map<Character, Long> helper(String s) {
-        Map<Character, Long> count = new HashMap<>();
-        int times = 0;
-        while (index < s.length()) {
-            char c = s.charAt(index++);
-            if (Character.isLetter(c)) {
-                // System.out.println("find " + c);
-                count.put(c, count.getOrDefault(c, (Long) 0L) + 1L);
-            }
-            else if (Character.isDigit(c)) {
-                times = c - '0';
-                index++;
-                Map<Character, Long> next = helper(s);
-                for (char ch : next.keySet()) {
-                    count.put(ch, (count.getOrDefault(ch, 0L) + times * next.get(ch)) % mod);
+    static void getRes(int t) {
+        int res = 0;
+        int max = -1;
+        for (int i = 0; i < n; i++) {
+            if (arr[i] > max) {
+                if (i == n - 1 || arr[i] > arr[i + 1]) {
+                    res++;
                 }
             }
-            else if (c == ')') {
-                return count;
-            }
+            max = Math.max(max, arr[i]);
         }
-        // System.out.println(count.size());
-        return count;
+        w.println("Case #" +  t +  ": " + res);
     }
 
     static class InputReader
@@ -241,7 +221,8 @@ public class Robot_Path_decodeString implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Robot_Path_decodeString(),"Main",1<<27).start();
+        new Thread(null, new A_Record_Breaker_Bruteforce(),"Main",1<<27).start();
     }
 
 }
+

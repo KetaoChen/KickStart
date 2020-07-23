@@ -1,34 +1,80 @@
+package KickStart_2020.RoundC_2020;
+
 import java.io.*;
 import java.util.*;
 
-public class Solution implements Runnable
+
+public class B_Stable_Wall_Topo implements Runnable
 {
+
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
-        w = new PrintWriter(System.out);
-        T = in.nextInt();
-        for (int t = 0; t < T; t++) {
-            n = in.nextInt();
-            arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = in.nextInt();
+        PrintWriter w = new PrintWriter(System.out);
+        int t = Integer.parseInt(in.nextLine());
+        for (int i = 1; i <= t; i++) {
+            String[] s = in.nextLine().split(" ");
+            int r = Integer.parseInt(s[0]);
+            int c = Integer.parseInt(s[1]);
+            String[] arr = new String[r];
+            for (int j = 0; j < r; j++) {
+                arr[j] = in.nextLine();
             }
-            getRes(t + 1);
-        }
 
+            w.println("Case #" + i + ": " + getRes(r, c, arr));
+        }
         w.flush();
         w.close();
     }
 
-    static PrintWriter w;
-    static int T, n;
-    static int[] arr;
 
-    static void getRes(int t) {
-        int res = 0;
-        w.println("Case #" +  t +  ": " + res);
+    private static String getRes(int row, int col, String[] arr) {
+        StringBuilder sb = new StringBuilder();
+        int[] d = new int[26];
+        Arrays.fill(d, -1);
+        List<Integer>[] list = new List[26];
+        for (int i = 0; i < 26; i++) {
+            list[i] = new ArrayList<>();
+        }
+
+        int count = 0;
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                char c = arr[i].charAt(j);
+                if (d[c - 'A'] == -1) {
+                    d[c - 'A'] = 0;
+                    count++;
+                }
+                if (i == 0) continue;
+                char below = arr[i - 1].charAt(j);
+                if (c != below) {
+                    d[below - 'A']++;
+                    list[c - 'A'].add(below - 'A');
+                }
+            }
+        }
+
+        Queue<Integer> q = new LinkedList<>();
+        for (int i = 0; i < 26; i++) {
+            if (d[i] == 0) {
+                q.offer(i);
+            }
+        }
+
+        while (!q.isEmpty()) {
+            int cur = q.poll();
+            count--;
+            sb.append((char) (cur + 'A'));
+            for (int next : list[cur]) {
+                d[next]--;
+                if (d[next] == 0) {
+                    q.offer(next);
+                }
+            }
+        }
+
+        return count == 0 ? sb.toString() : "-1";
     }
 
     static class InputReader
@@ -211,8 +257,7 @@ public class Solution implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution(),"Main",1<<27).start();
+        new Thread(null, new B_Stable_Wall_Topo(),"Main",1<<27).start();
     }
 
 }
-

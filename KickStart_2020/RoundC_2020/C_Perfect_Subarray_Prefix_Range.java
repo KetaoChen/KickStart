@@ -1,34 +1,58 @@
+package KickStart_2020.RoundC_2020;
+
 import java.io.*;
 import java.util.*;
 
-public class Solution implements Runnable
+
+public class C_Perfect_Subarray_Prefix_Range implements Runnable
 {
+
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
-        w = new PrintWriter(System.out);
-        T = in.nextInt();
-        for (int t = 0; t < T; t++) {
-            n = in.nextInt();
-            arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = in.nextInt();
+        PrintWriter w = new PrintWriter(System.out);
+        int t = in.nextInt();
+        for (int i = 1; i <= t; i++) {
+            int n = in.nextInt();
+            int[] arr = new int[n];
+            for (int j = 0; j < n; j++) {
+                arr[j] = in.nextInt();
             }
-            getRes(t + 1);
-        }
 
+            w.println("Case #" + i + ": " + getRes(arr));
+        }
         w.flush();
         w.close();
     }
 
-    static PrintWriter w;
-    static int T, n;
-    static int[] arr;
 
-    static void getRes(int t) {
-        int res = 0;
-        w.println("Case #" +  t +  ": " + res);
+    private static long getRes(int[] arr) {
+        long res = 0;
+        List<Integer> list = new ArrayList<>();
+        int num = 0;
+
+        Map<Integer, Integer> map = new HashMap<>();
+        map.put(0, 1);
+
+        int sum = 0, max = 0, min = 0;
+        for (int i = 0; i < arr.length; i++) {
+            sum += arr[i];
+            min = Math.min(min, sum);
+            max = Math.max(sum , max);
+            while (num * num <= max - min) {
+                list.add(num * num);
+                num++;
+            }
+
+            for (int perfect : list) {
+                int target = sum - perfect;
+                res += map.getOrDefault(target, 0);
+            }
+            map.put(sum, map.getOrDefault(sum, 0) + 1);
+        }
+
+        return res;
     }
 
     static class InputReader
@@ -211,8 +235,7 @@ public class Solution implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution(),"Main",1<<27).start();
+        new Thread(null, new C_Perfect_Subarray_Prefix_Range(),"Main",1<<27).start();
     }
 
 }
-

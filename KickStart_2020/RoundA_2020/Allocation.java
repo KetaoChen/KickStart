@@ -1,11 +1,11 @@
-package RoundA_2020;
+package KickStart_2020.RoundA_2020;
 
 import java.io.*;
 import java.util.*;
 import java.lang.*;
 
 
-public class Plate implements Runnable
+public class Allocation implements Runnable
 {
     @Override
     public void run() {
@@ -14,54 +14,40 @@ public class Plate implements Runnable
         int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
             int n = in.nextInt();
-            int K = in.nextInt();
-            int p = in.nextInt();
-            int[][] arr = new int[n][K];
-
+            int b = in.nextInt();
+            int[] arr = new int[n];
             for (int j = 0; j < n; j++) {
-                for (int k = 0; k < K; k++) {
-                    arr[j][k] = in.nextInt();
-                }
+                arr[j] = in.nextInt();
             }
-            getRes(i, n, K, p, arr, w);
+            getRes(i, n, b, arr, w);
         }
         w.flush();
         w.close();
     }
 
-    private void getRes(int t, int n, int K, int P,  int[][] arr, PrintWriter w) {
-        int[][] dp = new int[n + 1][P + 1];
-        // int[][] prefix = new int[n][K + 1];
-
-        for (int i = 1; i <= n ;i++) {
-            for (int p = 1; p <= P; p++) {
-                int sum = 0;
-                for (int k = 0; k < Math.min(p, K); k++) {
-                    sum += arr[i - 1][k];
-                    dp[i][p] = Math.max(dp[i][p], Math.max(dp[i - 1][p], dp[i - 1][p - k - 1] + sum));
-                }
+    private void getRes(int t, int n, int b, int[] arr, PrintWriter w) {
+        Arrays.sort(arr);
+        int res = 0;
+        for (int i = 0; i < n; i++) {
+            if (arr[i] > b) {
+                break;
             }
+            res++;
+            b -= arr[i];
         }
-        //        for (int i = 0; i <= n; i++) {
-        //            for (int p = 0; p <= P; p++) {
-        //                System.out.print(dp[i][p] + " ");
-        //            }
-        //            System.out.println();
-        //        }
-
-        w.println("Case #" + t + ": " + dp[n][P]);
+        w.println("Case #" + t + ": " +res);
     }
 
     // the base is n. The prime mod is mod.
-//    final static int p =(int) (1e9 + 7);
-//    public static long[] getInvArray(int n) {
-//        long[] inv = new long[n + 1];
-//        inv[1] = 1;
-//        for (int i = 2; i <= n; i++) {
-//            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
-//        }
-//        return inv;
-//    }
+    final static int p =(int) (1e9 + 7);
+    public static long[] getInvArray(int n) {
+        long[] inv = new long[n + 1];
+        inv[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
+        }
+        return inv;
+    }
 
 
     static class InputReader
@@ -244,7 +230,7 @@ public class Plate implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Plate(),"Main",1<<27).start();
+        new Thread(null, new Allocation(),"Main",1<<27).start();
     }
 
 }

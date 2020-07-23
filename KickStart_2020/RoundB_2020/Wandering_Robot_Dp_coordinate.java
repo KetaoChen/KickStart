@@ -1,35 +1,100 @@
-import java.io.*;
-import java.util.*;
+package KickStart_2020.RoundB_2020;
 
-public class Solution implements Runnable
+import java.io.*;
+import java.util.InputMismatchException;
+
+
+public class Wandering_Robot_Dp_coordinate implements Runnable
 {
+
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
-        w = new PrintWriter(System.out);
-        T = in.nextInt();
-        for (int t = 0; t < T; t++) {
-            n = in.nextInt();
-            arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = in.nextInt();
-            }
-            getRes(t + 1);
+        PrintWriter w = new PrintWriter(System.out);
+        int t = in.nextInt();
+        for (int i = 1; i <= t; i++) {
+            int col = in.nextInt();
+            int row = in.nextInt();
+            int l = in.nextInt();
+            int u = in.nextInt();
+            int r = in.nextInt();
+            int d = in.nextInt();
+            getRes(row, col, l, u, r, d, w, i);
         }
-
         w.flush();
         w.close();
     }
 
-    static PrintWriter w;
-    static int T, n;
-    static int[] arr;
 
-    static void getRes(int t) {
-        int res = 0;
-        w.println("Case #" +  t +  ": " + res);
+    private static void getRes(int row, int col, int l, int u, int r, int d, PrintWriter w, int t) {
+        if (check(1, 1, l, u, r, d) || row == 1 || col == 1) {
+            w.println("Case #" + t + ": " + 0.0);
+            return;
+        }
+
+
+        double fall = 0;
+        double[][] dp = new double[row + 1][col + 1];
+        dp[1][1] = 1;
+
+
+        for (int i = 1; i <= row; i++) {
+            for (int j = 1; j <= col; j++) {
+                if (i == 1 && j == 1) continue;
+
+                if (i == 1) {
+                    if (check(i, j, l, u, r, d)) {
+                        fall +=  dp[i][j - 1] / 2;
+                        dp[i][j] = 0;
+                    }
+                    else dp[i][j] = dp[i][j - 1] / 2;
+                }
+                else if (j == 1) {
+                    if (check(i, j, l, u, r, d)) {
+                        fall += dp[i - 1][j] / 2;
+                        dp[i][j] = 0;
+                    }
+                    else dp[i][j] = dp[i - 1][j] / 2;
+                }
+                else if (i == row && j == col) {
+                    if (check(i, j, l, u, r, d)) {
+                        fall += dp[i - 1][j] + dp[i][j - 1];
+                        dp[i][j] = 0;
+                    }
+                    else dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+                else if (i == row) {
+                    if (check(i, j, l, u, r, d)) {
+                        fall += dp[i - 1][j] / 2 + dp[i][j - 1];
+                        dp[i][j] = 0;
+                    }
+                    else dp[i][j] = dp[i - 1][j] / 2 + dp[i][j - 1];
+                }
+                else if (j == col) {
+                    if (check(i, j, l, u, r, d)) {
+                        fall += dp[i][j - 1] / 2 + dp[i - 1][j];
+                        dp[i][j] = 0;
+                    }
+                    else dp[i][j] = dp[i][j - 1] / 2 + dp[i][j - 1];
+                }
+                else {
+                    if (check(i, j, l, u, r, d)) {
+                        fall += dp[i - 1][j] / 2 + dp[i][j - 1] / 2;
+                        dp[i][j] = 0;
+                    }
+                    else dp[i][j] = dp[i - 1][j] / 2 + dp[i][j - 1] / 2;
+                }
+            }
+        }
+
+        w.println("Case #" + t + ": " + (1 - fall));
     }
+
+    private static boolean check(int i, int j, int l, int u, int r, int d) {
+        return i >= u && i <= d && j >= l && j <= r;
+    }
+
 
     static class InputReader
     {
@@ -211,8 +276,7 @@ public class Solution implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Solution(),"Main",1<<27).start();
+        new Thread(null, new Wandering_Robot_Dp_coordinate(),"Main",1<<27).start();
     }
 
 }
-

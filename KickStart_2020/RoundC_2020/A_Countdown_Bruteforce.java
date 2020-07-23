@@ -1,10 +1,10 @@
-package RoundB_2020;
+package KickStart_2020.RoundC_2020;
 
 import java.io.*;
 import java.util.InputMismatchException;
 
 
-public class Bus_Route implements Runnable
+public class A_Countdown_Bruteforce implements Runnable
 {
 
 
@@ -12,28 +12,38 @@ public class Bus_Route implements Runnable
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = (int)in.nextLong();
+        int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
-            int n = (int)in.nextLong();
-            long d = in.nextLong();
-            long[] arr = new long[n];
-            for (int j = 0; j < n; j++) {
-                arr[j] = in.nextLong();
+            int N = (int) in.nextInt();
+            int k = (int) in.nextInt();
+            Integer[] arr = new Integer[N];
+            for (int j = 0; j < N; j++) {
+                arr[j] = in.nextInt();
             }
-            getRes(arr, d, w, i);
+
+            w.println("Case #" + i + ": " + getRes(arr, k));
         }
         w.flush();
         w.close();
     }
 
-    private static void getRes(long[] arr, long d, PrintWriter w, int t) {
-        long res = d;
-        int l = arr.length;
-        for (int i = l - 1; i >= 0; i--) {
-            res = (res / arr[i]) * arr[i];
-        }
 
-        w.println("Case #" + t + ": " + res);
+    private static int getRes(Integer[] arr, int k) {
+        int res = 0;
+        for (int i = 0; i + k <= arr.length; i++) {
+            if (arr[i] == k) {
+                boolean have = true;
+                for (int j = i; j < arr.length ; j++) {
+                    if (arr[j] != k - (j - i)) {
+                        have = false;
+                        break;
+                    }
+                    if (arr[j] == 1) break;
+                }
+                if (have) res++;
+            }
+        }
+        return res;
     }
 
     static class InputReader
@@ -216,7 +226,7 @@ public class Bus_Route implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Bus_Route(),"Main",1<<27).start();
+        new Thread(null, new A_Countdown_Bruteforce(),"Main",1<<27).start();
     }
 
 }

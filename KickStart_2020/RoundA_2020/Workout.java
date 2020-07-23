@@ -1,132 +1,70 @@
-package RoundC_2020;
+package KickStart_2020.RoundA_2020;
 
 import java.io.*;
 import java.util.InputMismatchException;
 
 
-public class D_Candies_BIT_Odd_Even implements Runnable
+public class Workout implements Runnable
 {
-
-
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = Integer.parseInt(in.nextLine());
+        int t = in.nextInt();
         for (int i = 1; i <= t; i++) {
-            String[] s = in.nextLine().split(" ");
-            int n = Integer.parseInt(s[0]);
-            int q = Integer.parseInt(s[1]);
+            int n = in.nextInt();
+            int K = in.nextInt();
             int[] arr = new int[n];
-            s = in.nextLine().split(" ");
-            for (int j = 0; j < n; j++) {
-                arr[j] = Integer.parseInt(s[j]);
-            }
-            getRes(arr);
 
-            long res = 0;
-            for (int j = 0; j < q; j++) {
-                s = in.nextLine().split(" ");
-                char c = s[0].charAt(0);
-                int left = Integer.parseInt(s[1]), right = Integer.parseInt(s[2]);
-                if (c == 'Q') {
-                    res += cal(left - 1, right - 1);
-                }
-                else {
-                    update(left - 1, right);
-                }
+            for (int j = 0; j < n; j++) {
+                arr[j] = in.nextInt();
             }
-            w.println("Case #" + i + ": " + res);
+            getRes(i, n, K, arr, w);
         }
         w.flush();
         w.close();
     }
 
-    static long[] oddSum;
-    static long[] evenSum;
-    static long[] oddMulSum;
-    static long[] evenMulSum;
-    static long[] nums;
-
-
-    private static void getRes(int[] arr) {
-        nums = new long[arr.length];
-        oddSum = new long[arr.length + 1];
-        evenSum = new long[arr.length + 1];
-        oddMulSum = new long[arr.length + 1];
-        evenMulSum = new long[arr.length + 1];
-        for (int i = 0; i < arr.length; i++) {
-            update(i, arr[i]);
+    private void getRes(int t, int n, int K, int[] arr, PrintWriter w) {
+        int[] diff = new int[n - 1];
+        int max = 0;
+        for (int i = 1; i < n; i++) {
+            diff[i - 1] = arr[i] - arr[i - 1];
+            max = Math.max(max, diff[i - 1]);
         }
-    }
 
-    private static long cal(int left, int right) {
-        long evenMul = calEvenMulRange(right + 1) - calEvenMulRange(left);
-        long evenSum = calEvenSum(right + 1) - calEvenSum(left);
-
-        long oddMul = calOddMulRange(right + 1) - calOddMulRange(left);
-        long oddSum = calOddSum(right + 1) - calOddSum(left);
-
-        long even = evenMul - evenSum * left;
-        long odd = oddMul - oddSum * left;
-
-        return left % 2 == 0 ? even - odd : odd - even;
-    }
-
-    private static long calOddMulRange(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += oddMulSum[i];
-        }
-        return res;
-    }
-
-    private static long calEvenMulRange(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += evenMulSum[i];
-        }
-        return res;
-    }
-
-    private static long calEvenSum(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += evenSum[i];
-        }
-        return res;
-    }
-
-    private static long calOddSum(int index) {
-        long res = 0;
-        for (int i = index; i > 0; i -= lowbit(i)) {
-            res += oddSum[i];
-        }
-        return res;
-    }
-
-    private static void update(int i, int val) {
-        long change = val - nums[i];
-        nums[i] = val;
-        if (i % 2 == 0) {
-            for (int index = i + 1; index <= nums.length; index += lowbit(index)) {
-                evenSum[index] += change;
-                evenMulSum[index] += change * (i + 1);
+        int left = 1, right = max;
+        while (left < right) {
+            int mid = (left + right) / 2;
+            if (check(diff, mid) <= K) {
+                right = mid;
+            }
+            else {
+                left = mid + 1;
             }
         }
-        else {
-            for (int index = i + 1; index <= nums.length; index += lowbit(index)) {
-                oddSum[index] += change;
-                oddMulSum[index] += change * (i + 1);
-            }
+        int res = left;
+        w.println("Case #" + t + ": " + res);
+    }
+
+    private static int check(int[] arr, int t) {
+        int res = 0;
+        for (int num : arr) {
+            res += (num - 1) / t;
         }
-
+        return res;
     }
 
-    private static int lowbit(int x) {
-        return x & -x;
-    }
-
+    // the base is n. The prime mod is mod.
+//    final static int p =(int) (1e9 + 7);
+//    public static long[] getInvArray(int n) {
+//        long[] inv = new long[n + 1];
+//        inv[1] = 1;
+//        for (int i = 2; i <= n; i++) {
+//            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
+//        }
+//        return inv;
+//    }
 
 
     static class InputReader
@@ -309,7 +247,7 @@ public class D_Candies_BIT_Odd_Even implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new D_Candies_BIT_Odd_Even(),"Main",1<<27).start();
+        new Thread(null, new Workout(),"Main",1<<27).start();
     }
 
 }

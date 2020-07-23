@@ -1,50 +1,99 @@
-package RoundC_2020;
+package KickStart_2020.RoundA_2020;
 
 import java.io.*;
-import java.util.InputMismatchException;
+import java.util.*;
+import java.lang.*;
 
 
-public class A_Countdown_Bruteforce implements Runnable
+public class Bundling implements Runnable
 {
 
+
+    static class TrieNode {
+        TrieNode[] children;
+        int count;
+
+        public TrieNode() {
+            children = new TrieNode[26];
+            count = 0;
+        }
+    }
+
+
+    public static void insert(TrieNode root, String word) {
+        TrieNode cur = root;
+        for (char c : word.toCharArray()) {
+            if (cur.children[c - 'A'] == null) {
+                cur.children[c - 'A'] = new TrieNode();
+            }
+            cur = cur.children[c - 'A'];
+            cur.count++;
+        }
+    }
 
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = in.nextInt();
+        int t = Integer.parseInt(in.nextLine());
         for (int i = 1; i <= t; i++) {
-            int N = (int) in.nextInt();
-            int k = (int) in.nextInt();
-            Integer[] arr = new Integer[N];
-            for (int j = 0; j < N; j++) {
-                arr[j] = in.nextInt();
-            }
+            String s = in.nextLine();
+            String[] ss = s.split(" ");
+            int n = Integer.parseInt(ss[0]);
+            int K = Integer.parseInt(ss[1]);
+            String[] arr = new String[n];
 
-            w.println("Case #" + i + ": " + getRes(arr, k));
+            for (int j = 0; j < n; j++) {
+                arr[j] = in.nextLine();
+            }
+            getRes(i, n, K, arr, w);
         }
         w.flush();
         w.close();
     }
 
+    private void getRes(int t, int n, int K, String[] arr, PrintWriter w) {
+        // K = n / K;
+        TrieNode root = new TrieNode();
+        for (String s : arr) {
+            insert(root, s);
+        }
 
-    private static int getRes(Integer[] arr, int k) {
-        int res = 0;
-        for (int i = 0; i + k <= arr.length; i++) {
-            if (arr[i] == k) {
-                boolean have = true;
-                for (int j = i; j < arr.length ; j++) {
-                    if (arr[j] != k - (j - i)) {
-                        have = false;
-                        break;
-                    }
-                    if (arr[j] == 1) break;
-                }
-                if (have) res++;
+        int[] res = postOrder(root, 0, K);
+
+        w.println("Case #" + t + ": " + res[0]);
+    }
+
+    // res[0] len add to the res, res[1] used nodes
+    private static int[] postOrder(TrieNode root, int level, int K) {
+        int[] res = new int[2];
+        int used = 0;
+        for (int i = 0; i < 26; i++) {
+            if (root.children[i] != null) {
+                // System.out.println(i);
+                int[] add = postOrder(root.children[i], level + 1, K);
+                res[0] += add[0];
+                used += add[1];
             }
         }
+        int cur = root.count - used;
+        res[0] += cur / K * level;
+        res[1] += used + cur / K * K;
+        // System.out.println(level + " " + res[0] + " " + res[1]);
         return res;
     }
+
+    // the base is n. The prime mod is mod.
+//    final static int p =(int) (1e9 + 7);
+//    public static long[] getInvArray(int n) {
+//        long[] inv = new long[n + 1];
+//        inv[1] = 1;
+//        for (int i = 2; i <= n; i++) {
+//            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
+//        }
+//        return inv;
+//    }
+
 
     static class InputReader
     {
@@ -226,7 +275,7 @@ public class A_Countdown_Bruteforce implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new A_Countdown_Bruteforce(),"Main",1<<27).start();
+        new Thread(null, new Bundling(),"Main",1<<27).start();
     }
 
 }

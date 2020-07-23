@@ -1,54 +1,65 @@
-package RoundA_2020;
+package KickStart_2020.RoundB_2020;
 
 import java.io.*;
-import java.util.*;
-import java.lang.*;
+import java.util.HashMap;
+import java.util.InputMismatchException;
+import java.util.Map;
 
 
-public class Allocation implements Runnable
+public class Robot_Path_decodeString implements Runnable
 {
+
+
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
         PrintWriter w = new PrintWriter(System.out);
-        int t = in.nextInt();
+        int t = Integer.parseInt(in.nextLine());
         for (int i = 1; i <= t; i++) {
-            int n = in.nextInt();
-            int b = in.nextInt();
-            int[] arr = new int[n];
-            for (int j = 0; j < n; j++) {
-                arr[j] = in.nextInt();
-            }
-            getRes(i, n, b, arr, w);
+            String s = in.nextLine();
+            getRes(s, w, i);
         }
         w.flush();
         w.close();
     }
 
-    private void getRes(int t, int n, int b, int[] arr, PrintWriter w) {
-        Arrays.sort(arr);
-        int res = 0;
-        for (int i = 0; i < n; i++) {
-            if (arr[i] > b) {
-                break;
+    static int index;
+    static int mod = (int) 1e9;
+    private static void getRes(String s, PrintWriter w, int t) {
+        index = 0;
+        Map<Character, Long> map = helper(s);
+
+        long south = (1 + map.getOrDefault('S', 0L) - map.getOrDefault('N', 0L) + mod) % mod;
+        long east = (1 + map.getOrDefault('E', 0L) - map.getOrDefault('W', 0L) + mod) % mod;
+        if (south == 0) south = mod;
+        if (east == 0) east = mod;
+        w.println("Case #" + t + ": " + east + " " + south);
+    }
+
+    private static Map<Character, Long> helper(String s) {
+        Map<Character, Long> count = new HashMap<>();
+        int times = 0;
+        while (index < s.length()) {
+            char c = s.charAt(index++);
+            if (Character.isLetter(c)) {
+                // System.out.println("find " + c);
+                count.put(c, count.getOrDefault(c, (Long) 0L) + 1L);
             }
-            res++;
-            b -= arr[i];
+            else if (Character.isDigit(c)) {
+                times = c - '0';
+                index++;
+                Map<Character, Long> next = helper(s);
+                for (char ch : next.keySet()) {
+                    count.put(ch, (count.getOrDefault(ch, 0L) + times * next.get(ch)) % mod);
+                }
+            }
+            else if (c == ')') {
+                return count;
+            }
         }
-        w.println("Case #" + t + ": " +res);
+        // System.out.println(count.size());
+        return count;
     }
-
-    // the base is n. The prime mod is mod.
-    final static int p =(int) (1e9 + 7);
-    public static long[] getInvArray(int n) {
-        long[] inv = new long[n + 1];
-        inv[1] = 1;
-        for (int i = 2; i <= n; i++) {
-            inv[i] = ((p - p / i) * inv[p % i] % p + p) % p;
-        }
-        return inv;
-    }
-
 
     static class InputReader
     {
@@ -230,7 +241,7 @@ public class Allocation implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new Allocation(),"Main",1<<27).start();
+        new Thread(null, new Robot_Path_decodeString(),"Main",1<<27).start();
     }
 
 }

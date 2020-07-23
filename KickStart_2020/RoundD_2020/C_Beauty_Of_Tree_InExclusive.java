@@ -1,81 +1,80 @@
-package RoundC_2020;
+package KickStart_2020.RoundD_2020;
 
 import java.io.*;
 import java.util.*;
-
-
-public class B_Stable_Wall_Topo implements Runnable
+public class C_Beauty_Of_Tree_InExclusive implements Runnable
 {
-
-
     @Override
     public void run() {
         InputReader in = new InputReader(System.in);
-        PrintWriter w = new PrintWriter(System.out);
-        int t = Integer.parseInt(in.nextLine());
-        for (int i = 1; i <= t; i++) {
-            String[] s = in.nextLine().split(" ");
-            int r = Integer.parseInt(s[0]);
-            int c = Integer.parseInt(s[1]);
-            String[] arr = new String[r];
-            for (int j = 0; j < r; j++) {
-                arr[j] = in.nextLine();
-            }
+        w = new PrintWriter(System.out);
+        T = in.nextInt();
+        for (int t = 0; t < T; t++) {
+            n = in.nextInt();
+            A = in.nextInt();
+            B = in.nextInt();
+            cntA = new long[n + 1];
+            cntB = new long[n + 1];
 
-            w.println("Case #" + i + ": " + getRes(r, c, arr));
+            // initialize the parent nodes array in multiplication.
+            p = new int[n + 1][20];
+            p[1][0] = -1;
+            for (int i = 2; i <= n; i++) {
+                p[i][0] = in.nextInt();
+            }
+            for (int k = 1; k < 20; k++) {
+                for (int i = 1; i <= n; i++) {
+                    int fa = p[i][k - 1];
+                    p[i][k] = fa == -1 ? -1 : p[fa][k - 1];
+                }
+            }
+            getRes(t + 1);
         }
+
         w.flush();
         w.close();
     }
 
-
-    private static String getRes(int row, int col, String[] arr) {
-        StringBuilder sb = new StringBuilder();
-        int[] d = new int[26];
-        Arrays.fill(d, -1);
-        List<Integer>[] list = new List[26];
-        for (int i = 0; i < 26; i++) {
-            list[i] = new ArrayList<>();
-        }
-
-        int count = 0;
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
-                char c = arr[i].charAt(j);
-                if (d[c - 'A'] == -1) {
-                    d[c - 'A'] = 0;
-                    count++;
-                }
-                if (i == 0) continue;
-                char below = arr[i - 1].charAt(j);
-                if (c != below) {
-                    d[below - 'A']++;
-                    list[c - 'A'].add(below - 'A');
-                }
+    static int getKthP(int node, int k) {
+        for (int x = 0; x < 20; x++) {
+            if ((k >> x & 1) == 1) {
+                node = p[node][x];
+                if (node == -1) return -1;
             }
         }
-
-        Queue<Integer> q = new LinkedList<>();
-        for (int i = 0; i < 26; i++) {
-            if (d[i] == 0) {
-                q.offer(i);
-            }
-        }
-
-        while (!q.isEmpty()) {
-            int cur = q.poll();
-            count--;
-            sb.append((char) (cur + 'A'));
-            for (int next : list[cur]) {
-                d[next]--;
-                if (d[next] == 0) {
-                    q.offer(next);
-                }
-            }
-        }
-
-        return count == 0 ? sb.toString() : "-1";
+        return node;
     }
+
+    static PrintWriter w;
+    static int T, n, A, B;
+    static int[][] p;
+    static long[] cntA, cntB;
+
+    static void getRes(int t) {
+        double sum = 0;
+        for (int i = n; i > 0; i--) {
+            helper(i);
+        }
+
+        for (int i = 1; i <= n; i++) {
+            sum += (cntA[i] + cntB[i]) * n - cntA[i] * cntB[i];
+        }
+        w.println("Case #" +  t +  ": " + sum / ((long) n * n));
+    }
+
+    static void helper(int node) {
+        cntA[node]++;
+        cntB[node]++;
+        int pa = getKthP(node, A);
+        if (pa != -1) {
+            cntA[pa] += cntA[node];
+        }
+        int pb = getKthP(node, B);
+        if (pb != -1) {
+            cntB[pb] += cntB[node];
+        }
+    }
+
 
     static class InputReader
     {
@@ -257,7 +256,7 @@ public class B_Stable_Wall_Topo implements Runnable
 
     public static void main(String args[]) throws Exception
     {
-        new Thread(null, new B_Stable_Wall_Topo(),"Main",1<<27).start();
+        new Thread(null, new C_Beauty_Of_Tree_InExclusive(),"Main",1<<27).start();
     }
 
 }
